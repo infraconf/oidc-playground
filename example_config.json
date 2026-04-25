@@ -1,0 +1,41 @@
+{
+    "server": {
+        "signing_key": ""
+    },
+    "clients": [
+        {
+            "client_id": "6dbd1df4-7221-464c-9c26-54136580a8f7",
+            "client_secret": "6dbd1df4-7221-464c-9c26-54136580a8f7"
+        }
+    ],
+    "users": [
+        {
+            "name": "John Doe",
+            "description": "Admin",
+            "claims": {
+                "sub": "1",
+                "email": "john.doe@example.com",
+                "groups": ["admin"]
+            },
+            "custom_claims": {
+                "app": {
+                    "app": "admin"
+                }
+            }
+        },
+        {
+            "name": "Max Mustermann",
+            "description": "User",
+            "claims": {
+                "sub": "2",
+                "email": "max.mustermann@example.com",
+                "groups": ["member"]
+            },
+            "custom_claims": {
+                "app": {
+                    "app": "member"
+                }
+            }
+        }
+    ]
+}
