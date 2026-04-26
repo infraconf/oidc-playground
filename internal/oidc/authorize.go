@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/infraconf/oidc-playground/internal/config"
@@ -14,7 +15,6 @@ type AuthorizeParam struct {
 }
 
 type AuthorizeParams struct {
-	Name                string `json:"name"`
 	ResponseType        string `json:"response_type"`
 	ClientID            string `json:"client_id"`
 	RedirectURI         string `json:"redirect_uri"`
@@ -24,9 +24,16 @@ type AuthorizeParams struct {
 	CodeChallenge       string `json:"code_challenge"`
 	CodeChallengeMethod string `json:"code_challenge_method"`
 }
+
+type JSONData struct {
+	Users  []config.User
+	Params AuthorizeParams
+}
+
 type AuthorizePageData struct {
-	Params []AuthorizeParam `json:"params"`
-	Users  []config.User    `json:"users"`
+	Params   []AuthorizeParam
+	Users    []config.User
+	JSONData string
 }
 
 func (h *Handler) Authorize(w http.ResponseWriter, r *http.Request) {
@@ -60,9 +67,17 @@ func (h *Handler) Authorize(w http.ResponseWriter, r *http.Request) {
 		{"Code Challenge Method", params.CodeChallengeMethod, params.CodeChallengeMethod != ""},
 	}
 
-	data := AuthorizePageData{
-		Params: paramList,
+	dataStruct := &JSONData{
 		Users:  h.config.Users,
+		Params: params,
+	}
+
+	jsonData, _ := json.Marshal(dataStruct)
+
+	data := AuthorizePageData{
+		Params:   paramList,
+		Users:    h.config.Users,
+		JSONData: string(jsonData),
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")

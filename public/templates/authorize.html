@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>OIDC Authorize</title>
     <link rel="stylesheet" href="/assets/style.css">
+    <script>
+        const DATA = JSON.parse('{{ .JSONData }}');
+    </script>
+    <script src="/assets/script.js"></script>
 </head>
 <body>
     <main class="authorize-layout">
@@ -67,7 +71,7 @@
                 <div class="user-list">
                     {{ range $index, $user := .Users }}
                     <label class="user-option">
-                        <input type="radio" name="user" class="user-option-radio" {{ if eq $index 0 }}checked{{ end }}>
+                        <input type="radio" data-userid="{{ $user.ID }}" name="user" class="user-option-radio" {{ if eq $index 0 }}checked{{ end }}>
                         <div class="user-avatar">
                             {{ initials $user.Name }}
                         </div>
@@ -125,18 +129,7 @@
             </div>
 
             <div class="preview-body">
-                <pre class="code-preview">
-<code>{
-    <span class="token-key">"sub"</span>: "xxxxxxxxxxxxxx",
-    <span class="token-key">"aud"</span>: "xxxxxxxxxxxxxx",
-    <span class="token-key">"exp"</span>: 1234567890,
-    <span class="token-key">"iat"</span>: 1234567890,
-    <span class="token-key">"auth_time"</span>: 1234567890,
-    <span class="token-key">"groups"</span>: [
-        "admin"
-    ]
-}</code>
-                </pre>
+                <pre class="code-preview"><code>{}</code></pre>
             </div>
         </section>
 
