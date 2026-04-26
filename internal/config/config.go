@@ -16,14 +16,14 @@ type Client struct {
 }
 
 type BaseClaims struct {
-	Subject string   `json:"sub"`
-	Email   string   `json:"email"`
-	Groups  []string `json:"groups"`
+	Email  string   `json:"email"`
+	Groups []string `json:"groups"`
 }
 
 type Claim map[string]any
 
 type User struct {
+	ID           string           `json:"id"`
 	Name         string           `json:"name"`
 	Description  string           `json:"description"`
 	BaseClaims   BaseClaims       `json:"claims"`

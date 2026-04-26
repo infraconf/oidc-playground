@@ -16,10 +16,6 @@ func NewHandler(cfg *config.Config) *Handler {
 	return &Handler{config: cfg}
 }
 
-func (h *Handler) Authorize(w http.ResponseWriter, r *http.Request) {
-	h.notImplemented(w, r, "authorize")
-}
-
 func (h *Handler) Token(w http.ResponseWriter, r *http.Request) {
 	h.notImplemented(w, r, "token")
 }

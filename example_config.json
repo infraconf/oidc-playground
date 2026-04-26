@@ -10,10 +10,10 @@
     ],
     "users": [
         {
+            "id": "john",
             "name": "John Doe",
             "description": "Admin",
             "claims": {
-                "sub": "1",
                 "email": "john.doe@example.com",
                 "groups": ["admin"]
             },
@@ -24,10 +24,10 @@
             }
         },
         {
+            "id": "max",
             "name": "Max Mustermann",
             "description": "User",
             "claims": {
-                "sub": "2",
                 "email": "max.mustermann@example.com",
                 "groups": ["member"]
             },

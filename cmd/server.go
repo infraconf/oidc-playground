@@ -23,7 +23,11 @@ func main() {
 	}
 
 	handler := oidc.NewHandler(cfg)
-	server := web.NewServer(":8080", logger.WithGroup("http"), handler)
+	server, err := web.NewServer(":8080", logger.WithGroup("http"), handler)
+	if err != nil {
+		logger.Error("starting web server", "error", err)
+		os.Exit(1)
+	}
 
 	logger.Info("starting server", "addr", server.Addr, "config_path", cfgPath)
 	if err := server.ListenAndServe(); err != nil {
