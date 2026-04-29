@@ -9,7 +9,14 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"net/http"
 )
+
+func (h *Handler) JWKS(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, http.StatusOK, map[string]any{
+		"keys": []any{publicJWK(h.config.Server.SigningKey)},
+	})
+}
 
 func publicJWK(privateKey *rsa.PrivateKey) map[string]any {
 	publicKeyDER, err := x509.MarshalPKIXPublicKey(&privateKey.PublicKey)

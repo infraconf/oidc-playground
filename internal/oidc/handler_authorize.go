@@ -165,19 +165,21 @@ func (h *Handler) Authorize(w http.ResponseWriter, r *http.Request) {
 
 	code, _ := gen.Hex(16)
 	accessToken, _ := gen.Hex(128)
+	now := time.Now()
+	sessionExpireTime := now.Add(60 * time.Minute)
 	session := &Session{
 		AccessToken:         accessToken,
 		ClientID:            params.ClientID,
 		RedirectURI:         params.RedirectURI,
 		CodeChallenge:       params.CodeChallenge,
 		CodeChallengeMethod: params.CodeChallengeMethod,
-		CodeExpireTime:      time.Now().Add(10 * time.Second),
+		CodeExpireTime:      now.Add(10 * time.Second),
+		SessionExpireTime:   sessionExpireTime,
 	}
 
 	if slices.Contains(validation.scopes, "openid") {
-		now := time.Now()
 		iat := int(now.Unix())
-		exp := int(now.Add(60 * time.Minute).Unix())
+		exp := int(sessionExpireTime.Unix())
 
 		idToken := IDToken{
 			Issuer:         h.issuer(r),

@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/infraconf/oidc-playground/internal/config"
 )
@@ -23,66 +22,6 @@ func NewHandler(cfg *config.Config) *Handler {
 		codes:    map[string]*Session{},
 		sessions: map[string]*Session{},
 	}
-}
-
-func (h *Handler) putCode(code string, session *Session) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-
-	h.cleanupExpiredCodesLocked(time.Now())
-	h.codes[code] = session
-}
-
-func (h *Handler) getCode(code string) (*Session, bool) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-
-	h.cleanupExpiredCodesLocked(time.Now())
-	session, ok := h.codes[code]
-	return session, ok
-}
-
-func (h *Handler) exchangeCode(code string) (*Session, bool) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-
-	h.cleanupExpiredCodesLocked(time.Now())
-
-	session, ok := h.codes[code]
-	if !ok {
-		return nil, false
-	}
-
-	delete(h.codes, code)
-	h.sessions[session.AccessToken] = session
-
-	return session, true
-}
-
-func (h *Handler) getSession(accessToken string) (*Session, bool) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-
-	session, ok := h.sessions[accessToken]
-	return session, ok
-}
-
-func (h *Handler) cleanupExpiredCodesLocked(now time.Time) {
-	for code, session := range h.codes {
-		if session.CodeExpireTime.Before(now) {
-			delete(h.codes, code)
-		}
-	}
-}
-
-func (h *Handler) Revoke(w http.ResponseWriter, r *http.Request) {
-	h.notImplemented(w, r, "revoke")
-}
-
-func (h *Handler) JWKS(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, http.StatusOK, map[string]any{
-		"keys": []any{publicJWK(h.config.Server.SigningKey)},
-	})
 }
 
 func (h *Handler) issuer(r *http.Request) string {

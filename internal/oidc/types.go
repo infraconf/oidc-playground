@@ -16,6 +16,7 @@ type Session struct {
 	CodeChallenge       string
 	CodeChallengeMethod string
 	CodeExpireTime      time.Time
+	SessionExpireTime   time.Time
 }
 
 type IDToken struct {
