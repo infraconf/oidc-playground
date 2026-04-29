@@ -10,10 +10,14 @@ import (
 
 type Handler struct {
 	config *config.Config
+	codes  map[string]*Session
 }
 
 func NewHandler(cfg *config.Config) *Handler {
-	return &Handler{config: cfg}
+	return &Handler{
+		config: cfg,
+		codes:  map[string]*Session{},
+	}
 }
 
 func (h *Handler) Token(w http.ResponseWriter, r *http.Request) {

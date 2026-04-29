@@ -6,7 +6,7 @@
     <title>OIDC Authorize</title>
     <link rel="stylesheet" href="/assets/style.css">
     <script>
-        const DATA = JSON.parse('{{ .JSONData }}');
+        const DATA = JSON.parse('{{ .AuthorizationPageModel }}');
     </script>
     <script src="/assets/script.js"></script>
 </head>
@@ -99,16 +99,8 @@
 
                 <div class="options-list">
                     <label class="option-item">
-                        <input type="checkbox" name="option-error-1" class="option-checkbox">
-                        <span class="option-label">Error Option 1</span>
-                    </label>
-                    <label class="option-item">
-                        <input type="checkbox" name="option-error-2" class="option-checkbox">
-                        <span class="option-label">Error Option 2</span>
-                    </label>
-                    <label class="option-item">
-                        <input type="checkbox" name="option-error-3" class="option-checkbox">
-                        <span class="option-label">Error Option 3</span>
+                        <input type="checkbox" name="full-id-token" class="option-checkbox">
+                        <span class="option-label">Full ID Token</span>
                     </label>
                 </div>
             </section>
@@ -123,7 +115,7 @@
                         </svg>
                     </div>
                     <div>
-                        <h2 class="section-title section-title-offset">Token Preview</h2>
+                        <h2 class="section-title section-title-offset">Token / UserInfo Preview</h2>
                     </div>
                 </div>
             </div>
@@ -135,8 +127,8 @@
 
         <div class="footer-actions">
             <div class="action-group">
-                <button type="button" class="button button-secondary">Cancel</button>
-                <button type="button" class="button button-primary">Authorize</button>
+                <button type="button" id="cancel" class="button button-secondary">Back</button>
+                <button type="button" id="submit" class="button button-primary">Authorize</button>
             </div>
         </div>
     </main>

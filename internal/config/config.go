@@ -11,23 +11,24 @@ type Server struct {
 }
 
 type Client struct {
-	ClientID     string `json:"client_id"`
-	ClientSecret string `json:"client_secret"`
+	ClientID     string   `json:"client_id"`
+	ClientSecret string   `json:"client_secret"`
+	RedirectURIs []string `json:"redirect_uris"`
 }
 
-type BaseClaims struct {
+type StandardClaims struct {
 	Email  string   `json:"email"`
 	Groups []string `json:"groups"`
 }
 
-type Claim map[string]any
+type ClaimSet map[string]any
 
 type User struct {
-	ID           string           `json:"id"`
-	Name         string           `json:"name"`
-	Description  string           `json:"description"`
-	BaseClaims   BaseClaims       `json:"claims"`
-	CustomClaims map[string]Claim `json:"custom_claims"`
+	ID             string              `json:"id"`
+	Name           string              `json:"name"`
+	Description    string              `json:"description"`
+	StandardClaims StandardClaims      `json:"claims"`
+	CustomClaims   map[string]ClaimSet `json:"custom_claims"`
 }
 
 type Config struct {

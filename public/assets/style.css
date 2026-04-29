@@ -332,6 +332,10 @@ body {
     transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
+.button.not-usable {
+    cursor: no-drop;   
+}
+
 .button-secondary {
     border-color: #52525b;
     background: var(--surface-alt);
