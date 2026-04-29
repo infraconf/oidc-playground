@@ -8,11 +8,14 @@ import (
 )
 
 type Session struct {
-	AccessToken    string
-	IDToken        string
-	UserInfo       json.RawMessage
-	ClientID       string
-	CodeExpireTime time.Time
+	AccessToken         string
+	IDToken             string
+	UserInfo            json.RawMessage
+	ClientID            string
+	RedirectURI         string
+	CodeChallenge       string
+	CodeChallengeMethod string
+	CodeExpireTime      time.Time
 }
 
 type IDToken struct {

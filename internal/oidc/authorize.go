@@ -166,9 +166,12 @@ func (h *Handler) Authorize(w http.ResponseWriter, r *http.Request) {
 	code, _ := gen.Hex(16)
 	accessToken, _ := gen.Hex(128)
 	session := &Session{
-		AccessToken:    accessToken,
-		ClientID:       params.ClientID,
-		CodeExpireTime: time.Now().Add(10 * time.Second),
+		AccessToken:         accessToken,
+		ClientID:            params.ClientID,
+		RedirectURI:         params.RedirectURI,
+		CodeChallenge:       params.CodeChallenge,
+		CodeChallengeMethod: params.CodeChallengeMethod,
+		CodeExpireTime:      time.Now().Add(10 * time.Second),
 	}
 
 	if slices.Contains(validation.scopes, "openid") {
@@ -214,7 +217,7 @@ func (h *Handler) Authorize(w http.ResponseWriter, r *http.Request) {
 		session.UserInfo = userInfoJSON
 	}
 
-	h.codes[code] = session
+	h.putCode(code, session)
 
 	redirectURL, err := buildAuthorizationRedirect(params.RedirectURI, code, params.State)
 	if err != nil {

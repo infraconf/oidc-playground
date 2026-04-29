@@ -4,28 +4,75 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/infraconf/oidc-playground/internal/config"
 )
 
 type Handler struct {
-	config *config.Config
-	codes  map[string]*Session
+	config   *config.Config
+	mu       sync.Mutex
+	codes    map[string]*Session
+	sessions map[string]*Session
 }
 
 func NewHandler(cfg *config.Config) *Handler {
 	return &Handler{
-		config: cfg,
-		codes:  map[string]*Session{},
+		config:   cfg,
+		codes:    map[string]*Session{},
+		sessions: map[string]*Session{},
 	}
 }
 
-func (h *Handler) Token(w http.ResponseWriter, r *http.Request) {
-	h.notImplemented(w, r, "token")
+func (h *Handler) putCode(code string, session *Session) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	h.cleanupExpiredCodesLocked(time.Now())
+	h.codes[code] = session
 }
 
-func (h *Handler) UserInfo(w http.ResponseWriter, r *http.Request) {
-	h.notImplemented(w, r, "userinfo")
+func (h *Handler) getCode(code string) (*Session, bool) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	h.cleanupExpiredCodesLocked(time.Now())
+	session, ok := h.codes[code]
+	return session, ok
+}
+
+func (h *Handler) exchangeCode(code string) (*Session, bool) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	h.cleanupExpiredCodesLocked(time.Now())
+
+	session, ok := h.codes[code]
+	if !ok {
+		return nil, false
+	}
+
+	delete(h.codes, code)
+	h.sessions[session.AccessToken] = session
+
+	return session, true
+}
+
+func (h *Handler) getSession(accessToken string) (*Session, bool) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	session, ok := h.sessions[accessToken]
+	return session, ok
+}
+
+func (h *Handler) cleanupExpiredCodesLocked(now time.Time) {
+	for code, session := range h.codes {
+		if session.CodeExpireTime.Before(now) {
+			delete(h.codes, code)
+		}
+	}
 }
 
 func (h *Handler) Revoke(w http.ResponseWriter, r *http.Request) {
@@ -71,6 +118,13 @@ func writeJSON(w http.ResponseWriter, statusCode int, payload any) {
 	if err := json.NewEncoder(w).Encode(payload); err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
+}
+
+func writeTokenError(w http.ResponseWriter, statusCode int, errorCode string, description string) {
+	writeJSON(w, statusCode, map[string]any{
+		"error":             errorCode,
+		"error_description": description,
+	})
 }
 
 func bigEndianBytes(value int) []byte {
