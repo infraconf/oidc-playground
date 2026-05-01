@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OIDC Authorize</title>
+    <link rel="stylesheet" href="/assets/style.css">
+    <script>
+        const DATA = JSON.parse('{{ .AuthorizationPageModel }}');
+    </script>
+    <script src="/assets/script.js"></script>
+</head>
+<body>
+    <main class="authorize-layout">
+        <div class="authorize-grid">
+            <section class="panel">
+                <div class="section-header">
+                    <div class="icon-badge">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6M7 4h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="section-title">Passed parameters</h2>
+                        <p class="section-subtitle">The following parameters were included in the request.</p>
+                    </div>
+                </div>
+
+                <div class="table-shell">
+                    <table class="parameter-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{ range $index, $param := .Params }}
+                            <tr>
+                                <td class="parameter-name">{{ $param.Name }}</td>
+                                <td class="parameter-value">
+                                    <span class="parameter-value-text">{{ $param.Value }}</span>
+                                    {{ if $param.Status }}
+                                    <span class="parameter-status parameter-status-ok" aria-label="Parameter okay" title="Parameter okay">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.313a1 1 0 0 1-1.42-.003l-3.25-3.313a1 1 0 0 1 1.428-1.4l2.54 2.589 6.54-6.593a1 1 0 0 1 1.406-.007Z" clip-rule="evenodd" />
+                                        </svg>
+                                    </span>
+                                    {{ end }}
+                                </td>
+                            </tr>
+                            {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="section-header">
+                    <div class="icon-badge">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6.75a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.118a7.5 7.5 0 0 1 15 0A17.933 17.933 0 0 1 12 21.75a17.933 17.933 0 0 1-7.5-1.632Z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="section-title">User Selection</h2>
+                        <p class="section-subtitle">Please select the user you want to log in as.</p>
+                    </div>
+                </div>
+
+                <div class="user-list">
+                    {{ range $index, $user := .Users }}
+                    <label class="user-option">
+                        <input type="radio" data-userid="{{ $user.ID }}" name="user" class="user-option-radio" {{ if eq $index 0 }}checked{{ end }}>
+                        <div class="user-avatar">
+                            {{ initials $user.Name }}
+                        </div>
+                        <div class="user-copy">
+                            <div class="user-name">{{ $user.Name }}</div>
+                            <div class="user-description">{{ $user.Description }}</div>
+                        </div>
+                    </label>
+                    {{ end }}
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="section-header">
+                    <div class="icon-badge">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3 5 6v6c0 5 3.4 8.6 7 9 3.6-.4 7-4 7-9V6l-7-3Z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="section-title">Options</h2>
+                        <p class="section-subtitle">Advanced settings for the request</p>
+                    </div>
+                </div>
+
+                <div class="options-list">
+                    <label class="option-item">
+                        <input type="checkbox" name="full-id-token" class="option-checkbox">
+                        <span class="option-label">Full ID Token</span>
+                    </label>
+                </div>
+            </section>
+        </div>
+
+        <section class="panel panel-preview">
+            <div class="preview-header">
+                <div class="section-header">
+                    <div class="icon-badge icon-badge-compact">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17 4 12l5-5m6 10 5-5-5-5" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="section-title section-title-offset">UserInfo Preview</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preview-body">
+                <pre class="code-preview"><code>{}</code></pre>
+            </div>
+        </section>
+
+        <div class="footer-actions">
+            <div class="action-group">
+                <button type="button" id="cancel" class="button button-secondary">Back</button>
+                <button type="button" id="submit" class="button button-primary">Authorize</button>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
