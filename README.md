@@ -2,6 +2,8 @@
 
 OIDC Playground is a small OpenID Connect test server for local development, demos, and protocol exploration. It provides a compact environment for trying common OIDC flows and inspecting how clients interact with an identity provider.
 
+![Authorize View](docs/authorize_view.png)
+
 ## Quickstart
 
 1. Create a JSON config file for the server, clients, and demo users.
