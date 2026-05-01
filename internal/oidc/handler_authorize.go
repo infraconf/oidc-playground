@@ -197,6 +197,9 @@ func (h *Handler) Authorize(w http.ResponseWriter, r *http.Request) {
 			idToken = *userInfo
 		}
 
+		idToken.CodeHash = hashClaim(code)
+		idToken.AccessTokenHash = hashClaim(accessToken)
+
 		idTokenJWT, err := signIDToken(idToken, h.config.Server.SigningKey)
 		if err != nil {
 			writeJSON(w, http.StatusInternalServerError, map[string]any{

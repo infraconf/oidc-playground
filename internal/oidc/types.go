@@ -27,6 +27,8 @@ type IDToken struct {
 	IssuedAt          int    `json:"iat"`
 	AuthTime          int    `json:"auth_time"`
 	Nonce             string `json:"nonce,omitempty"`
+	CodeHash          string `json:"c_hash,omitempty"`
+	AccessTokenHash   string `json:"at_hash,omitempty"`
 	PreferredUsername string `json:"preferred_username,omitempty"`
 
 	Email         string `json:"email,omitempty"`
