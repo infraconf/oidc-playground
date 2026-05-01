@@ -40,16 +40,6 @@ func (h *Handler) issuer(r *http.Request) string {
 	return scheme + "://" + r.Host
 }
 
-func (h *Handler) notImplemented(w http.ResponseWriter, r *http.Request, endpoint string) {
-	writeJSON(w, http.StatusNotImplemented, map[string]any{
-		"error":       "not_implemented",
-		"description": "endpoint business logic not implemented yet",
-		"endpoint":    endpoint,
-		"method":      r.Method,
-		"path":        r.URL.Path,
-	})
-}
-
 func writeJSON(w http.ResponseWriter, statusCode int, payload any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
