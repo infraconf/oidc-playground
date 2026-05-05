@@ -1,0 +1,24 @@
+{
+    "server": {},
+    "clients": [],
+    "users": [
+        {
+            "id": "john",
+            "name": "John Doe",
+            "description": "Admin",
+            "claims": {
+                "email": "john.doe@example.com",
+                "groups": ["admin"]
+            }
+        },
+        {
+            "id": "max",
+            "name": "Max Mustermann",
+            "description": "User",
+            "claims": {
+                "email": "max.mustermann@example.com",
+                "groups": ["member"]
+            }
+        }
+    ]
+}

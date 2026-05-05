@@ -9,12 +9,15 @@ import (
 	"github.com/infraconf/oidc-playground/internal/web"
 )
 
+var version = "-"
+
 func main() {
 	logger := slog.New(
 		slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 			Level: slog.LevelInfo,
 		}),
 	)
+	logger.Info("starting oidc-playground", "version", version)
 
 	cfg, cfgPath, err := config.LoadFromEnv()
 	if err != nil {
