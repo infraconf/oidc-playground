@@ -62,8 +62,9 @@ jobs:
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=latest
-            type=ref,event=tag
+            type=semver,pattern={{version}}
+          flavor: |
+            latest=true
 
       - name: Build and push multi-arch image
         env:
