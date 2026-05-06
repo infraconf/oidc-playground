@@ -74,8 +74,8 @@ window.onload = () => {
         };
 
         if (DATA.error_message != "") {
-            idToken.push({ k: "error", v: DATA.error_message});
-            userInfo.push({ k: "error", v: DATA.error_message});
+            previews.idToken.push({ k: "error", v: DATA.error_message});
+            previews.userInfo.push({ k: "error", v: DATA.error_message});
         } else {
             const { idToken, userInfo } = generateToken();
             previews.idToken = idToken;
