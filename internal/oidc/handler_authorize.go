@@ -98,8 +98,10 @@ func (h *Handler) authorizeSettings(w http.ResponseWriter, params *AuthorizePara
 	}
 }
 
-func buildUserInfo(user config.User, scopes []string, token IDToken) *IDToken {
-	userInfo := token
+func buildUserInfo(user config.User, scopes []string, token IDToken) *UserInfo {
+	userInfo := UserInfo{
+		Subject: token.Subject,
+	}
 
 	if slices.Contains(scopes, "profile") {
 		userInfo.PreferredUsername = user.ID
@@ -194,7 +196,7 @@ func (h *Handler) Authorize(w http.ResponseWriter, r *http.Request) {
 		userInfo := buildUserInfo(*validation.targetUser, validation.scopes, idToken)
 
 		if slices.Contains(validation.options, "full-id-token") {
-			idToken = *userInfo
+			idToken.Details = userInfo
 		}
 
 		idToken.CodeHash = hashClaim(code)
