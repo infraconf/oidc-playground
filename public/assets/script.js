@@ -1,41 +1,57 @@
 window.onload = () => {
-    const codeBody = document.querySelector('.code-preview code');
+    const idTokenCodeDOM = document.querySelector('.code-preview.idtoken code');
+    const userInfoCodeDOM = document.querySelector('.code-preview.userinfo code');
     const scopes = DATA.params.scope.split(',');
     const generateToken = () => {
-        const args = [
-            { k: "iss", v: "xxxxxxxxxxxxxx" },
-            { k: "sub", v: "xxxxxxxxxxxxxx" },
-            { k: "aud", v: DATA.params.client_id },
-            { k: "exp", v: "1234567890" },
-            { k: "iat", v: "1234567890" },
-            { k: "auth_time", v: "1234567890" },
-        ];
-
+        const selectedOptions = Array.from(document.querySelectorAll('.option-checkbox:checked')).map(n => n.name);
         const selectedUser = document.querySelector('.user-option-radio:checked');
         const userID = selectedUser.dataset.userid;
         const userData = DATA.users.find(user => user.id === userID);
 
+        const resp = {
+            idToken: [
+                { k: "iss", v: "xxxxxxxxxxxxxx" },
+                { k: "sub", v: "xxxxxxxxxxxxxx" },
+                { k: "aud", v: DATA.params.client_id },
+                { k: "exp", v: "1234567890" },
+                { k: "iat", v: "1234567890" },
+                { k: "auth_time", v: "1234567890" },
+                { k: "c_hash", v: "xxxxxxxxxxxxxx" },
+                { k: "at_hash", v: "xxxxxxxxxxxxxx" },
+            ],
+            userInfo: [
+                { k: "sub", v: "xxxxxxxxxxxxxx" },
+            ],
+        };
+
+        const push = (claim) => {
+            if (selectedOptions.includes('full-id-token')) {
+                resp.idToken.push(claim);
+            }
+            resp.userInfo.push(claim);
+        };
+
         if (DATA.params.nonce != "") {
-            args.push({ k: "nonce", v: DATA.params.nonce });
+            resp.idToken.push({ k: "nonce", v: DATA.params.nonce });
         }
 
         if (userData != undefined) {
             const customClaims = userData.custom_claims ?? {};
 
             if (scopes.includes('email')) {
-                args.push({ k: "email", v: userData.claims.email });
-                args.push({ k: "email_verified", v: true , raw: true });
+                push({ k: "email", v: userData.claims.email });
+                push({ k: "email_verified", v: true , raw: true });
             }
             
             if (scopes.includes('profile')) {
-                args.push({ k: "name", v: userData.name });
-                args.push({ k: "given_name", v: userData.name });
-                args.push({ k: "preferred_username", v: userData.id });
-                args.push({ k: "nickname", v: userData.id });
+                push({ k: "name", v: userData.name });
+                push({ k: "given_name", v: userData.name });
+                push({ k: "preferred_username", v: userData.id });
+                push({ k: "nickname", v: userData.id });
             }
 
             if (scopes.includes('groups')) {
-                args.push({ k: "groups", v: '[\n' + userData.claims.groups.map(g => {
+                push({ k: "groups", v: '[\n' + userData.claims.groups.map(g => {
                     return '        "' + g + '"';
                 }).join(',\n') + '\n    ]', raw: true });
             }
@@ -44,28 +60,39 @@ window.onload = () => {
                 const claim = customClaims[scope];
                 if (claim != undefined) {
                     for (const [key, value] of Object.entries(claim)) {
-                        args.push({ k: key, v: value });
+                        push({ k: key, v: value });
                     }
                 }
             });
         }
-        return args;
+        return resp;
     };
     const generatePreview = () => {
-        let args = [];
+        const previews = {
+            userInfo: [],
+            idToken: [], 
+        };
 
         if (DATA.error_message != "") {
-            args.push({ k: "error", v: DATA.error_message});
+            idToken.push({ k: "error", v: DATA.error_message});
+            userInfo.push({ k: "error", v: DATA.error_message});
         } else {
-            args = generateToken();
+            const { idToken, userInfo } = generateToken();
+            previews.idToken = idToken;
+            previews.userInfo = userInfo;
         }
 
-        codeBody.innerHTML = '{\n' + args.map(arg => {
-            if (arg.raw) {
-                return `    <span class="token-key">"${arg.k}"</span>: ${arg.v}`;
-            }
-            return `    <span class="token-key">"${arg.k}"</span>: "${arg.v}"`;
-        }).join(',\n') +'\n}';
+        const print = (claims) => {
+            return '{\n' + claims.map(claim => {
+                if (claim.raw) {
+                    return `    <span class="token-key">"${claim.k}"</span>: ${claim.v}`;
+                }
+                return `    <span class="token-key">"${claim.k}"</span>: "${claim.v}"`;
+            }).join(',\n') +'\n}'
+        };
+
+        idTokenCodeDOM.innerHTML = print(previews.idToken);
+        userInfoCodeDOM.innerHTML = print(previews.userInfo);
     };
     const submit = () => {
         const optionParameter = Array.from(document.querySelectorAll('.option-checkbox:checked')).map(n => n.name).join(',');
@@ -85,6 +112,9 @@ window.onload = () => {
     };
 
     document.querySelectorAll('.user-option-radio').forEach((elem) => {
+        elem.addEventListener('click', generatePreview);
+    });
+    document.querySelectorAll('.option-checkbox').forEach((elem) => {
         elem.addEventListener('click', generatePreview);
     });
 
