@@ -19,16 +19,8 @@ type Session struct {
 	SessionExpireTime   time.Time
 }
 
-type IDToken struct {
-	Issuer            string `json:"iss"`
+type UserInfo struct {
 	Subject           string `json:"sub"`
-	Audience          string `json:"aud"`
-	ExpirationTime    int    `json:"exp"`
-	IssuedAt          int    `json:"iat"`
-	AuthTime          int    `json:"auth_time"`
-	Nonce             string `json:"nonce,omitempty"`
-	CodeHash          string `json:"c_hash,omitempty"`
-	AccessTokenHash   string `json:"at_hash,omitempty"`
 	PreferredUsername string `json:"preferred_username,omitempty"`
 
 	Email         string `json:"email,omitempty"`
@@ -40,6 +32,42 @@ type IDToken struct {
 	Groups    *[]string `json:"groups,omitempty"`
 
 	Extras map[string]any `json:"-"`
+}
+
+type IDToken struct {
+	Issuer          string `json:"iss"`
+	Subject         string `json:"sub"`
+	Audience        string `json:"aud"`
+	ExpirationTime  int    `json:"exp"`
+	IssuedAt        int    `json:"iat"`
+	AuthTime        int    `json:"auth_time"`
+	Nonce           string `json:"nonce,omitempty"`
+	CodeHash        string `json:"c_hash,omitempty"`
+	AccessTokenHash string `json:"at_hash,omitempty"`
+
+	Details *UserInfo `json:"-"`
+}
+
+func (t UserInfo) MarshalJSON() ([]byte, error) {
+	type Alias UserInfo
+	data := map[string]any{}
+	b, err := json.Marshal(struct {
+		Alias
+	}{
+		Alias: Alias(t),
+	})
+	if err != nil {
+		return nil, err
+	}
+	json.Unmarshal(b, &data)
+
+	if t.Extras != nil {
+		for k, v := range t.Extras {
+			data[k] = v
+		}
+	}
+
+	return json.Marshal(data)
 }
 
 func (t IDToken) MarshalJSON() ([]byte, error) {
@@ -55,8 +83,14 @@ func (t IDToken) MarshalJSON() ([]byte, error) {
 	}
 	json.Unmarshal(b, &data)
 
-	if t.Extras != nil {
-		for k, v := range t.Extras {
+	if t.Details != nil {
+		details := map[string]any{}
+		b, err := json.Marshal(t.Details)
+		if err != nil {
+			return nil, err
+		}
+		json.Unmarshal(b, &details)
+		for k, v := range details {
 			data[k] = v
 		}
 	}

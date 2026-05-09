@@ -49,6 +49,8 @@ func validateAuthorizeParams(cfg *config.Config, params *AuthorizeParams) author
 		validation.errorMessage = "redirect uri is not registered for client"
 	case len(validation.scopes) == 0:
 		validation.errorMessage = "missing scope"
+	case !slices.Contains(validation.scopes, "openid"):
+		validation.errorMessage = "missing openid scope"
 	case params.CodeChallenge != "" && !isValidCodeChallenge(params.CodeChallenge):
 		validation.errorMessage = "invalid code challenge"
 	case params.CodeChallengeMethod != "" && params.CodeChallengeMethod != "S256":
